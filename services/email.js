@@ -1,5 +1,6 @@
 'use strict';
 
+const cheerio = require('cheerio');
 const _ = require('lodash');
 // From: https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression
 const isValidEmail =
@@ -17,7 +18,24 @@ const templateSettings = {
   escape: /\{\{-(.+?)\}\}/g,
 };
 
-const templater = (tmpl) => _.template(tmpl, templateSettings);
+const getAllStyleTextsInsideBody = ($) => {
+  return $('body style').get().map(el => el.children[0].data).join('\n')
+}
+
+const templater = (tmpl) => {
+  return (...args) => {
+    const parsedTemplateText = _.template(tmpl, templateSettings)(...args)
+
+    // Take all styles inside body and add them to <head></head>, or they'll
+    // disappear when the email is sent
+    const $ = cheerio.load(parsedTemplateText);
+    const styleTexts = getAllStyleTextsInsideBody($)
+    $('body style').remove()
+    $('head style').append(styleTexts)
+
+    return $.html()
+  }
+};
 
 /**
  * fill subject, text and html using lodash template
