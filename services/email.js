@@ -32,6 +32,7 @@ const templater = (tmpl) => {
     const styleTexts = getAllStyleTextsInsideBody($)
     $('body style').remove()
     $('head style').append(styleTexts)
+    $('body table:not(:first-child):not(:last-child)').addClass('paper')
 
     return $.html()
   }
