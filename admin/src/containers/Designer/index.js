@@ -54,28 +54,7 @@ const defaultEditorTools = {
 const defaultEditorAppearance = { minWidth: '100%', theme: 'light' };
 const defaultEditorOptions = { fonts: { showDefaultFonts: false } };
 const currentTemplateTags = {
-  mergeTags: [
-    {
-      name: 'User',
-      mergeTags: [
-        {
-          name: 'First Name',
-          value: '{{= USER.firstname }}',
-          sample: (userInfo && userInfo.firstname) || 'John',
-        },
-        {
-          name: 'Last Name',
-          value: '{{= USER.lastname }}',
-          sample: (userInfo && userInfo.lastname) || 'Doe',
-        },
-        {
-          name: 'Email',
-          value: '{{= USER.username }}',
-          sample: (userInfo && userInfo.username) || 'john@doe.com',
-        },
-      ],
-    },
-  ],
+  mergeTags: [],
   mergeTagsConfig: {
     autocompleteTriggerChar: '@',
     delimiter: ['{{=', '}}'],
@@ -337,6 +316,7 @@ const EmailDesigner = ({ isCore = false }) => {
             <div style={{ height: '100%', display: mode === 'html' ? 'flex' : 'none' }}>
               <React.StrictMode>
                 <EmailEditor
+                  projectId={40284}
                   key={serverConfigLoaded ? 'server-config' : 'default-config'}
                   ref={emailEditorRef}
                   onLoad={onLoadHandler}
