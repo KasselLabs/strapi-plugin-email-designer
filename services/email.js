@@ -22,9 +22,12 @@ const getAllStyleTextsInsideBody = ($) => {
   return $('body style').get().map(el => el.children[0].data).join('\n')
 }
 
-const templater = (tmpl) => {
+const templater = (tmpl, parseStyles) => {
   return (...args) => {
     const parsedTemplateText = _.template(tmpl, templateSettings)(...args)
+    if (!parseStyles) {
+      return parsedTemplateText
+    }
 
     // Take all styles inside body and add them to <head></head>, or they'll
     // disappear when the email is sent
@@ -101,7 +104,7 @@ const sendTemplatedEmail = async (emailOptions = {}, emailTemplate = {}, data = 
   const templatedAttributes = attributes.reduce(
     (compiled, attribute) =>
       emailTemplate[attribute]
-        ? Object.assign(compiled, { [attribute]: templater(emailTemplate[attribute])(data) })
+        ? Object.assign(compiled, { [attribute]: templater(emailTemplate[attribute], attribute !== 'subject')(data) })
         : compiled,
     {}
   );
@@ -140,7 +143,7 @@ const compose = async ({ templateId, data = {} }) => {
   const templatedAttributes = attributes.reduce(
     (compiled, attribute) =>
       emailTemplate[attribute]
-        ? Object.assign(compiled, { [attribute]: templater(emailTemplate[attribute])(data) })
+        ? Object.assign(compiled, { [attribute]: templater(emailTemplate[attribute], attribute !== 'subject')(data) })
         : compiled,
     {}
   );
