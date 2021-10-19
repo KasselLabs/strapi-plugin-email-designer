@@ -40,6 +40,8 @@ const templater = (tmpl, parseStyles) => {
   }
 };
 
+const EMAIL_OPTIONS_TO_VALIDATE = new Set(['from', 'to', 'cc', 'bcc', 'replyTo']);
+
 /**
  * fill subject, text and html using lodash template
  * @param {object} emailOptions - to, from and replyto...
@@ -50,7 +52,7 @@ const templater = (tmpl, parseStyles) => {
 const sendTemplatedEmail = async (emailOptions = {}, emailTemplate = {}, data = {}) => {
   Object.entries(emailOptions).forEach(([key, address]) => {
     // ⬇︎ Thanks to @xcivit 's #39 suggestion
-    if (key !== 'attachments') {
+    if (EMAIL_OPTIONS_TO_VALIDATE.has(key)) {
       if (Array.isArray(address)) {
         address.forEach((email) => {
           if (!isValidEmail.test(email)) throw new Error(`Invalid "${key}" email address with value "${email}"`);
