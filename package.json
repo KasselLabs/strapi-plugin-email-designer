@@ -1,12 +1,15 @@
 {
   "name": "strapi-plugin-email-designer",
-  "version": "1.1.7",
+  "version": "2.1.0",
   "description": "Strapi Email designer plugin.",
   "homepage": "https://github.com/alexzaganelli/strapi-plugin-email-designer#readme",
   "strapi": {
+    "displayName": "Email Designer",
     "name": "email-designer",
     "icon": "envelope",
-    "description": "Design your own email templates directly from the Strapi admin panel and use the magic to send it programmatically in your controllers / services."
+    "description": "Design your own email templates directly from the Strapi admin panel and use the magic to send it programmatically in your controllers / services.",
+    "required": false,
+    "kind": "plugin"
   },
   "scripts": {
     "cypress:install": "node ./node_modules/cypress/bin/cypress install",
@@ -16,13 +19,23 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.10",
+    "dayjs": "^1.10.7",
     "decode-html": "^2.0.0",
     "html-to-text": "^8.0.0",
     "lodash": "^4.17.21",
-    "react-email-editor": "^1.3.0",
+    "react-email-editor": "^1.5.0",
     "react-github-btn": "^1.2.0",
     "react-syntax-highlighter": "^15.4.3",
     "striptags": "^3.2.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "cypress": "^7.5.0",
+    "eslint": "^7.29.0",
+    "prettier": "^2.3.1"
+  },
+  "peerDependencies": {
+    "@strapi/strapi": "^4.0.0"
   },
   "author": {
     "name": "Alexandre Zaganelli",
@@ -37,7 +50,7 @@
     }
   ],
   "engines": {
-    "node": ">=10.16.0 <=14.x.x",
+    "node": ">=12.x.x <=16.x.x",
     "npm": ">=6.0.0"
   },
   "repository": {
@@ -55,11 +68,5 @@
     "templates-design"
   ],
   "license": "MIT",
-  "funding": "https://paypal.me/AlexZaganelli",
-  "devDependencies": {
-    "babel-eslint": "^10.1.0",
-    "cypress": "^7.5.0",
-    "eslint": "^7.29.0",
-    "prettier": "^2.3.1"
-  }
+  "funding": "https://www.buymeacoffee.com/alexzaganelli"
 }

@@ -1,4 +1,4 @@
-# Strapi email designer plugin 💅
+# Strapi Email Designer plugin 💅
 
 <p align="left">
   <a href="https://www.npmjs.org/package/strapi-plugin-email-designer">
@@ -16,15 +16,22 @@
   <a href="#">
     <img alt="Repo stars" src="https://img.shields.io/github/stars/alexzaganelli/strapi-plugin-email-designer?color=white&label=Github&style=plastic"></a>
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<a href="#contributors-"><img alt="Contributors" src="https://img.shields.io/badge/all_contributors-8-orange.svg?style=plastic"></a>
+<a href="#contributors-"><img alt="Contributors" src="https://img.shields.io/badge/all_contributors-12-orange.svg?style=plastic"></a>
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
 Design your own email templates directly from the [Strapi CMS](https://github.com/strapi/strapi) admin panel and use the magic to send programmatically email from your controllers / services.
 
-<img src="https://raw.githubusercontent.com/alexzaganelli/strapi-plugin-email-designer/main/public/assets/designer-screenshot.jpg" alt="Designer screenshot" />
+<img src="https://raw.githubusercontent.com/alexzaganelli/strapi-plugin-email-designer/main/public/assets/strapi-email-designer-v4.jpg" alt="Designer screenshot" />
 
 _Visual composer provided by [Unlayer](https://unlayer.com/)_
+
+&nbsp;
+
+## ⚙️ Versions
+
+- **Strapi v4** - (current) - [v2.x](https://github.com/alexzaganelli/strapi-plugin-email-designer)
+- **Strapi v3** - [v1.x](https://github.com/alexzaganelli/strapi-plugin-email-designer/tree/strapi-v3)
 
 &nbsp;
 
@@ -54,6 +61,32 @@ yarn add strapi-plugin-email-designer@latest
 # or
 
 npm i -S strapi-plugin-email-designer@latest
+```
+
+- you may need also to add to the unlayer domain to the _Content Security Policy_. Update the config file `config/middleware.js` as:
+
+```diff
+// ...
+- "strapi::security",
++ {
++     name: "strapi::security",
++     config: {
++       contentSecurityPolicy: {
++         directives: {
++           "script-src": ["'self'", "editor.unlayer.com"],
++           "frame-src": ["'self'", "editor.unlayer.com"],
++           "img-src": [
++             "'self'",
++             "data:",
++             "cdn.jsdelivr.net",
++             "strapi.io",
++             "s3.amazonaws.com",
++           ],
++         },
++       },
++     },
++   },
+// ...
 ```
 
 - After successful installation you've to build a fresh package that includes plugin UI. To archive that simply use:
@@ -98,34 +131,47 @@ Tips: in the template's body is possible to iterate array like this:
   // ...
 
   try {
-    await strapi.plugins['email-designer'].services.email.sendTemplatedEmail(
-      {
-        to: 'to@example.com', // required
-        from: 'from@example.com', // optional if /config/plugins.js -> email.settings.defaultFrom is set
-        replyTo: 'reply@example.com', // optional if /config/plugins.js -> email.settings.defaultReplyTo is set
-        attachments: [], // optional array of files
-      },
-      {
-        templateId: 1, // required - you can get the template id from the admin panel (can change on import)
-        sourceCodeToTemplateId: 55, // ID that can be defined in the template designer (won't change on import)
-        subject: `Thank you for your order`, // If provided here will override the template's subject. Can include variables like `Thank you for your order {{= user.firstName }}!`
-      },
-      {
-        // this object must include all variables you're using in your email template
-        USER: {
-          firstname: 'John',
-          lastname: 'Doe',
+    await strapi
+      .plugin('email-designer')
+      .service('email')
+      .sendTemplatedEmail(
+        {
+          // required
+          to: 'to@example.com',
+
+          // optional if /config/plugins.js -> email.settings.defaultFrom is set
+          from: 'from@example.com',
+
+          // optional if /config/plugins.js -> email.settings.defaultReplyTo is set
+          replyTo: 'reply@example.com',
+
+          // optional array of files
+          attachments: [],
         },
-        order: {
-          products: [
-            { name: 'Article 1', price: 9.99 },
-            { name: 'Article 2', price: 5.55 },
-          ],
+        {
+          // required - Ref ID defined in the template designer (won't change on import)
+          templateReferenceId: 9,
+
+          // If provided here will override the template's subject.
+          // Can include variables like `Thank you for your order {{= USER.firstName }}!`
+          subject: `Thank you for your order`,
         },
-        shippingCost: 5,
-        total: 20.54,
-      }
-    );
+        {
+          // this object must include all variables you're using in your email template
+          USER: {
+            firstname: 'John',
+            lastname: 'Doe',
+          },
+          order: {
+            products: [
+              { name: 'Article 1', price: 9.99 },
+              { name: 'Article 2', price: 5.55 },
+            ],
+          },
+          shippingCost: 5,
+          total: 20.54,
+        }
+      );
   } catch (err) {
     strapi.log.debug('📺: ', err);
     return ctx.badRequest(null, err);
@@ -143,13 +189,13 @@ Complete installation requirements are exact same as for Strapi itself and can b
 
 **Supported Strapi versions**:
 
-- Strapi v3.5.x
+- Strapi v4.0.x
 
 (This plugin may work with the older Strapi versions, but these are not tested nor officially supported at this time.)
 
 **Node / NPM versions**:
 
-- NodeJS >= 12.10 <= 14
+- NodeJS >= 12.10 < 17
 - NPM >= 6.x
 
 **We recommend always using the latest version of Strapi to start your new projects**.
@@ -159,62 +205,73 @@ Complete installation requirements are exact same as for Strapi itself and can b
 You can pass configuration options directly to the editor that is used by this plugin. To do so, in your `config/plugins.js` file of your project, configure the plugin like this example:
 
 ```javascript
-module.exports = () => ({
-  ...
+module.exports = ({ env }) => ({
+  // ...
   'email-designer': {
-    editor: {
-      tools: {
-        heading: {
-          properties: {
-            text: {
-              value: 'This is the new default text!'
-            }
-          }
-        }
-      },
-      options: {
-        features: {
-          colorPicker: {
-            presets: ['#D9E3F0', '#F47373', '#697689', '#37D67A']
-          }
-        },
-        fonts: {
-          showDefaultFonts: false,
-          customFonts: [
-            {
-              label: "Anton",
-              value: "'Anton', sans-serif",
-              url: "https://fonts.googleapis.com/css?family=Anton",
+    enabled: true,
+
+    // ⬇︎ Add the config property
+    config: {
+      editor: {
+        // optional - if you have a premium unlayer account
+        projectId: [UNLAYER_PROJECT_ID],
+
+        tools: {
+          heading: {
+            properties: {
+              text: {
+                value: 'This is the new default text!',
+              },
             },
+          },
+        },
+        options: {
+          features: {
+            colorPicker: {
+              presets: ['#D9E3F0', '#F47373', '#697689', '#37D67A'],
+            },
+          },
+          fonts: {
+            showDefaultFonts: false,
+            /*
+             * If you want use a custom font you need a premium unlayer account and pass a projectId number :-(
+             */
+            customFonts: [
+              {
+                label: 'Anton',
+                value: "'Anton', sans-serif",
+                url: 'https://fonts.googleapis.com/css?family=Anton',
+              },
+              {
+                label: 'Lato',
+                value: "'Lato', Tahoma, Verdana, sans-serif",
+                url: 'https://fonts.googleapis.com/css?family=Lato',
+              },
+              // ...
+            ],
+          },
+          mergeTags: [
             {
-              label: "Lato",
-              value: "'Lato', Tahoma, Verdana, sans-serif",
-              url: "https://fonts.googleapis.com/css?family=Lato",
+              name: 'Email',
+              value: '{{= USER.username }}',
+              sample: 'john@doe.com',
             },
             // ...
           ],
         },
-        mergeTags: [
-          {
-            name: 'Email',
-            value: '{{= USER.username }}',
-            sample: 'john@doe.com',
+        appearance: {
+          theme: 'dark',
+          panels: {
+            tools: {
+              dock: 'left',
+            },
           },
-          // ...
-        ]
+        },
       },
-      appearance: {
-        theme: "dark",
-        panels: {
-          tools: {
-            dock: 'left'
-          }
-        }
-      }
-    }
+    },
   },
-  ...
-})
+  // ...
+});
 ```
 
 See [Unlayer's documentation](https://docs.unlayer.com) for more options.
@@ -272,8 +329,8 @@ Give a star if this project helped you.
 
 ## 🌎 Community support
 
-- For general help using Strapi, please refer to [the official Strapi documentation](https://strapi.io/documentation/).
-- Strapi Slack [channel](https://slack.strapi.io/)
+- For general help using Strapi, please refer to [the official Strapi documentation](https://docs.strapi.io/developer-docs/latest/getting-started/introduction.html).
+- For support with this plugin you can DM me in the Strapi Discord [channel](https://discord.strapi.io/).
 - You can DM me on [Twitter](https://twitter.com/alexzaganelli)
 
 ## 📝 License
@@ -299,6 +356,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://www.linkedin.com/in/moritzeck"><img src="https://avatars.githubusercontent.com/u/22457755?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Moritz Eck</b></sub></a><br /><a href="https://github.com/alexzaganelli/strapi-plugin-email-designer/commits?author=meck93" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/B0rk3"><img src="https://avatars.githubusercontent.com/u/40357504?v=4?s=100" width="100px;" alt=""/><br /><sub><b>B0rk3</b></sub></a><br /><a href="https://github.com/alexzaganelli/strapi-plugin-email-designer/commits?author=B0rk3" title="Code">💻</a></td>
+    <td align="center"><a href="https://nihey.org"><img src="https://avatars.githubusercontent.com/u/5278570?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nihey Takizawa</b></sub></a><br /><a href="https://github.com/alexzaganelli/strapi-plugin-email-designer/commits?author=nihey" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/ggirodda"><img src="https://avatars.githubusercontent.com/u/12408871?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ciro Alabrese</b></sub></a><br /><a href="https://github.com/alexzaganelli/strapi-plugin-email-designer/commits?author=ggirodda" title="Code">💻</a></td>
+    <td align="center"><a href="https://zaeck.ch/"><img src="https://avatars.githubusercontent.com/u/22471485?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nik Zaugg</b></sub></a><br /><a href="https://github.com/alexzaganelli/strapi-plugin-email-designer/commits?author=nikzaugg" title="Code">💻</a></td>
   </tr>
 </table>
 
@@ -316,3 +377,9 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 ## Forkers ✨
 
 [![Forkers repo roster for @alexzaganelli/strapi-plugin-email-designer](https://reporoster.com/forks/alexzaganelli/strapi-plugin-email-designer)](https://github.com/alexzaganelli/strapi-plugin-email-designer/network/members)
+
+## Support Me ✨
+
+If you like this plugin I'm very happy, so lets drink a beer. _Salute! 🍻_
+
+[!["Buy Me A Beer"](https://img.buymeacoffee.com/button-api/?text=Buy+me+a+beer&emoji=🍺&slug=alexzaganelli&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/alexzaganelli)

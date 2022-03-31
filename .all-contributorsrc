@@ -83,6 +83,42 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "B0rk3",
+      "name": "B0rk3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40357504?v=4",
+      "profile": "https://github.com/B0rk3",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nihey",
+      "name": "Nihey Takizawa",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5278570?v=4",
+      "profile": "https://nihey.org",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ggirodda",
+      "name": "Ciro Alabrese",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12408871?v=4",
+      "profile": "https://github.com/ggirodda",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nikzaugg",
+      "name": "Nik Zaugg",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22471485?v=4",
+      "profile": "https://zaeck.ch/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
